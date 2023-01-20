@@ -1,14 +1,3 @@
-#Description:
-'''
-    This is a turn-based fighting game, player vs AI. Each player has a sword and a shield, sword for attacking and shield for defending. There are two types of attack slash and thrust the 
-same  with defense there are two types of defense block and dodge. The game only lasts a round. Your goal is to survive or kill the enemy(if you can).
-
-Instructions: 
-    * Simply input thrust or slash when attacking
-    * Input block or dodge when defending.
-    * You have 5 seconds, dont take too long to decide. 
-'''
-
 import time
 
 # Initialize the variables for the game, player and computer, their scores, and the attack and defense moves.
@@ -20,6 +9,7 @@ class DuelStart:
         self.computer_score = 0
         self.attack = None
         self.defend = None
+        self.turn = None
 
     # The minimax algorithm that the computer uses to determine its moves.
     def minimax(self, depth, is_maximizing):
@@ -58,8 +48,12 @@ class DuelStart:
         print("Computer: ", self.computer_score)
 
     #Checks if the moves made by the player is valid.
-    def check_moves(self, player, move):
+    def check_moves(self, player, move, turn):
         valid_moves = ["slash", "thrust", "block", "dodge"]
+        if turn == "attack":
+            valid_moves = ["slash","thrust"]
+        elif self.turn == "defend":
+            valid_moves = ["block", "dodge"]
         if move not in valid_moves:
             print("Invalid move, please choose a valid move.")
             self.play()
@@ -78,24 +72,29 @@ class DuelStart:
     #Accpets the move when the player is attacking  and checks if it's valid or not.
     def attack_player(self):
         start_time = time.time()
+        self.turn = "attack"
         move = input("Choose your attack (slash/thrust): ")
         if time.time() - start_time > 5:
             print("Player took too long to make a move, automatic loss.")
             self.computer_score += 1
             self.check_game_state()
-        self.check_moves(self.player, move)
+            exit()
+        self.check_moves(self.player, move, self.turn)
         if self.is_winning(self.player) == -1:
             self.player_score += 1
         
     #Accpets the move when the player is defending and checks if it's valid or not.
     def defend_player(self):
         start_time = time.time()
+        self.turn = "defend"
         move = input("Choose your defense (block/dodge): ")
         if time.time() - start_time > 5:
             print("Player took too long to make a move, automatic loss.")
             self.computer_score += 1
             self.check_game_state()
-        self.check_moves(self.player, move)
+            exit()
+
+        self.check_moves(self.player, move, self.turn)
         if self.is_winning(self.player) == -1:
             self.player_score += 1
 
@@ -103,7 +102,7 @@ class DuelStart:
     def check_game_state(self):
         if self.is_draw():
             print(self.show_scores())
-            print("Draw!")
+            print("It's a Draw! You Survived!")
             exit()
 
         if self.is_winning(self.player):
@@ -119,11 +118,11 @@ class DuelStart:
     # Check if the player or computer wins the round
     def is_winning(self, player):
         #If either of these conditions are true, it returns 1 indicating that the computer has won .
-        if player == self.computer:
+        if player == "Computer":
             if (self.attack == "slash" and self.defend == "dodge") or (self.attack == "thrust" and self.defend == "block"):
                 return 1
-        #If either of these conditions are true, it returns -1 indicating that the player has lost.
-        elif player == self.player:
+        #If either of these conditions are true, it returns -1 indicating that the player has survived.
+        elif player == "Player":
             if (self.attack == "slash" and self.defend == "block") or (self.attack == "thrust" and self.defend == "dodge"):
                 return -1
         return 0
@@ -178,7 +177,6 @@ class DuelStart:
             self.defend_player()
             self.check_game_state()
 
-        self.show_scores()
             
 
 if __name__ == '__main__':
@@ -207,36 +205,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-    slash > dodge
-    slash < block
-    slash = thrust(you will lose to the computer)
-    thrust > block
-    thrust < dodge
-    thrust = slash(you will lose to the computer)
-'''
 
 
 
